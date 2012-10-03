@@ -1,4 +1,4 @@
 self: play -> play-logger 0.1
 
 require:
-    - play
+    - play 1.2.5
