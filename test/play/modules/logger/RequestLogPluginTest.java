@@ -1,7 +1,6 @@
 package play.modules.logger;
 
 import org.junit.Test;
-import play.modules.logger.RequestLogPlugin;
 import play.mvc.Http;
 
 import static org.junit.Assert.assertEquals;
@@ -35,3 +34,4 @@ public class RequestLogPluginTest {
     assertEquals("hello=A B C", RequestLogPlugin.extractParams(request));
   }
 }
+

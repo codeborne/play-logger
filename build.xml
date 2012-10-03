@@ -14,9 +14,6 @@
         <fileset dir="${play.path}/framework">
             <include name="*.jar"/>
         </fileset>
-        <fileset dir="lib">
-            <include name="*.jar"/>
-        </fileset>
     </path>
 
     <target name="build" depends="compile">
@@ -29,7 +26,7 @@
                 <include name="**/play.static"/>
             </fileset>
         </copy>
-        <jar destfile="lib/play-play-logger.jar" basedir="tmp/classes">
+        <jar destfile="lib/play-logger.jar" basedir="tmp/classes">
             <manifest>
                 <section name="Play-module">
                     <attribute name="Specification-Title" value="play-logger"/>
