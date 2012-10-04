@@ -1,0 +1,7 @@
+/out
+/tmp
+/dist
+/lib
+*.iml
+*.ipr
+*.iws
