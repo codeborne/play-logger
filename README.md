@@ -37,7 +37,7 @@ Use it in your log4j.xml configuration
         </layout>
       </appender>
 
-      <appender name="general" class="org.apache.log4j.DailyRollingFileAppender">
+      <appender name="general" class="play.modules.logger.PlayPreprocessingRollingFileAppender">
         <param name="file" value="logs/general.log"/>
         <layout class="play.modules.logger.ExtendedPatternLayout">
           <param name="ConversionPattern" value="%d{yyyy.MM.dd HH:mm:ss,SSS Z} [%R] %-5p %c{1} - %m%n"/>

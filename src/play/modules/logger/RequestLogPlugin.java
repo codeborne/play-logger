@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
+import play.mvc.results.Result;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,29 +22,29 @@ public class RequestLogPlugin extends PlayPlugin {
   static final String EXCLUDE = "(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)";
   static final String PASSWORD = "password=.*?(\t|$)";
 
-  @Override
-  public void beforeActionInvocation(Method actionMethod) {
-    Http.Request.current().args.put("startTime", currentTimeMillis());
-    Http.Request.current().args.put("requestId", prefix + "-" + counter.incrementAndGet());
+  @Override public void routeRequest(Http.Request request) {
+    request.args.put("startTime", currentTimeMillis());
+    request.args.put("requestId", prefix + "-" + counter.incrementAndGet());
   }
 
-  @Override public void afterActionInvocation() {
+  @Override public void onActionInvocationResult(Result result) {
+    logRequestInfo(result);
+  }
+
+  static void logRequestInfo(Result result) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
     long start = (Long)request.args.get("startTime");
 
-    StringBuilder line = new StringBuilder();
-    line.append(request.action).append(' ');
-    line.append(request.remoteAddress).append(' ');
-    line.append(session.getId()).append(' ');
-    line.append(extractParams(request));
-    line.append(' ').append(currentTimeMillis() - start).append(" ms");
+    StringBuilder line = new StringBuilder()
+      .append(request.action).append(' ')
+      .append(request.remoteAddress).append(' ')
+      .append(session.getId()).append(' ')
+      .append(extractParams(request))
+      .append(" -> ").append(result.getClass().getSimpleName())
+      .append(' ').append(currentTimeMillis() - start).append(" ms");
 
     logger.info(line.toString());
-  }
-
-  @Override public void onInvocationException(Throwable e) {
-    afterActionInvocation();
   }
 
   static String extractParams(Http.Request request) {
