@@ -4,6 +4,7 @@ import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import play.exceptions.ActionNotFoundException;
 import play.exceptions.JavaExecutionException;
+import play.mvc.Http;
 import play.mvc.results.Error;
 import play.mvc.results.NotFound;
 
@@ -14,7 +15,7 @@ import static play.modules.logger.RequestLogPlugin.logRequestInfo;
  */
 public class PlayPreprocessingRollingFileAppender extends DailyRollingFileAppender {
   @Override public void append(LoggingEvent event) {
-    if ("play".equals(event.getLoggerName()) && event.getThrowableInformation() != null) {
+    if ("play".equals(event.getLoggerName()) && event.getThrowableInformation() != null && Http.Request.current() != null) {
       Throwable throwable = event.getThrowableInformation().getThrowable();
       if (throwable instanceof ActionNotFoundException) {
         logRequestInfo(new NotFound(""));
