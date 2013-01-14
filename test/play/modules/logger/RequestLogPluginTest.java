@@ -6,7 +6,8 @@ import play.mvc.Http;
 import static org.junit.Assert.assertEquals;
 
 public class RequestLogPluginTest {
-  private final Http.Request request = new Http.Request();
+  @SuppressWarnings("deprecation")
+  Http.Request request = new Http.Request();
 
   @Test
   public void passwordIsMasked() throws Exception {
