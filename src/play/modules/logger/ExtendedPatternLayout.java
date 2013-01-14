@@ -41,9 +41,9 @@ public class ExtendedPatternLayout extends org.apache.log4j.PatternLayout {
   static class RequestIdPatternConverter extends PatternConverter {
     protected String convert(LoggingEvent event) {
       Http.Request request = Http.Request.current();
-      if (request == null) return "";
+      if (request == null) return "job";
       Object rid = request.args.get("requestId");
-      return rid == null ? "" : rid.toString();
+      return rid == null ? "unknown" : rid.toString();
     }
   }
 }
