@@ -11,8 +11,8 @@ public class RequestLogPluginTest {
 
   @Test
   public void passwordIsMasked() throws Exception {
-    request.querystring = "?username=anton&password=123";
-    assertEquals("username=anton\tpassword=*", RequestLogPlugin.extractParams(request));
+    request.querystring = "?username=anton&password=123&password2=456&newPassword=678&password=789&oldPassword=1693&age=12";
+    assertEquals("username=anton\tpassword=*\tpassword2=*\tnewPassword=*\tpassword=*\toldPassword=*\tage=12", RequestLogPlugin.extractParams(request));
   }
 
   @Test
