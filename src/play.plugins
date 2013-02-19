@@ -1,1 +1,2 @@
 402:play.modules.logger.RequestLogPlugin
+503:play.modules.logger.ExceptionsMonitoringPlugin
