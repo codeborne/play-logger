@@ -20,7 +20,7 @@ public class PlayPreprocessingRollingFileAppender extends DailyRollingFileAppend
     if (ti != null) {
       Throwable throwable = ti.getThrowable();
 
-      ExceptionsMonitoringPlugin.add(throwable);
+      ExceptionsMonitoringPlugin.register(throwable);
 
       if ("play".equals(event.getLoggerName()) && Http.Request.current() != null)
         if (appendToRequestLog(throwable))
