@@ -1,27 +1,29 @@
 package play.modules.logger;
 
 import play.PlayPlugin;
-import play.cache.Cache;
+import play.exceptions.JavaExecutionException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.String.format;
+
 public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
+  private static ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
+
   static void register(Throwable throwable) {
-
-    ConcurrentHashMap<Class, AtomicInteger> exceptions = getExceptions();
-
-    Class clazz = throwable.getClass();
-    if (exceptions.containsKey(clazz))
-      exceptions.get(clazz).incrementAndGet();
-    else
-      exceptions.put(clazz, new AtomicInteger(1));
-
-    Cache.replace("exceptions", exceptions);
+    if (throwable instanceof JavaExecutionException) throwable = throwable.getCause();
+    String key = throwable.toString().split("\n")[0];
+    AtomicInteger value = exceptions.get(key);
+    if (value == null) exceptions.put(key, value = new AtomicInteger());
+    value.incrementAndGet();
   }
 
   @Override public String getStatus() {
@@ -31,16 +33,17 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
     out.println("Exceptions statistics:");
     out.println("~~~~~~~~~~~~~~~~~~~~~~");
 
-    for (Map.Entry<Class, AtomicInteger> entry : getExceptions().entrySet()) {
-      out.println(entry.getKey().getSimpleName() + " : " + entry.getValue().get());
+    ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
+    Collections.sort(sorted, new Comparator<Map.Entry<String, AtomicInteger>>() {
+      @Override public int compare(Map.Entry<String, AtomicInteger> o1, Map.Entry<String, AtomicInteger> o2) {
+        return o2.getValue().get() - o1.getValue().get();
+      }
+    });
+
+    for (Map.Entry<String, AtomicInteger> entry : sorted) {
+      out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
     }
 
     return sw.toString();
-  }
-
-  @SuppressWarnings("unchecked") private static ConcurrentHashMap<Class, AtomicInteger> getExceptions() {
-    ConcurrentHashMap<Class, AtomicInteger> map = (ConcurrentHashMap<Class, AtomicInteger>) Cache.get("exceptions");
-    if (map == null) map = new ConcurrentHashMap<>();
-    return map;
   }
 }
