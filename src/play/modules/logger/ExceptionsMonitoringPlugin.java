@@ -18,7 +18,7 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
   private static ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
 
-  static void register(Throwable throwable) {
+  public static void register(Throwable throwable) {
     if (throwable instanceof JavaExecutionException) throwable = throwable.getCause();
     String key = throwable.toString().split("\n")[0];
     AtomicInteger value = exceptions.get(key);
