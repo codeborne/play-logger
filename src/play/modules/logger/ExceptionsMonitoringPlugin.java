@@ -1,10 +1,13 @@
 package play.modules.logger;
 
 import play.PlayPlugin;
+import play.exceptions.ActionNotFoundException;
 import play.exceptions.JavaExecutionException;
+import play.exceptions.UnexpectedException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,9 +21,10 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
   private static ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
 
-  public static void register(Throwable throwable) {
-    if (throwable instanceof JavaExecutionException) throwable = throwable.getCause();
-    String key = throwable.toString().split("\n")[0];
+  public static void register(Throwable e) {
+    if (e instanceof ActionNotFoundException) return;
+    if (e instanceof UnexpectedException || e instanceof InvocationTargetException || e instanceof JavaExecutionException) e = e.getCause();
+    String key = e.toString().split("\n")[0];
     AtomicInteger value = exceptions.get(key);
     if (value == null) exceptions.put(key, value = new AtomicInteger());
     value.incrementAndGet();
