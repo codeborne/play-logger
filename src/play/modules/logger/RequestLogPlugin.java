@@ -21,6 +21,8 @@ public class RequestLogPlugin extends PlayPlugin {
 
   static final String EXCLUDE = "(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)";
   static final String PASSWORD = "(?i)(.*?password.*?)=.*?(\t|$)";
+  static final String CVV = "(?i)(.*?card\\.cvv*?)=.*?(\t|$)";
+  static final String CARD_NUMBER = "(?i)(.*?card\\.number*?)=.*?(\t|$)";
 
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
@@ -53,7 +55,11 @@ public class RequestLogPlugin extends PlayPlugin {
       if (params.startsWith("?")) params = params.substring(1);
       if ("application/x-www-form-urlencoded".equals(request.contentType))
         params += (isNotEmpty(params) ? "\t" : "") + request.params.get("body");
-      return URLDecoder.decode(params.replace("&", "\t").replaceAll(EXCLUDE, "").replaceAll(PASSWORD, "$1=*$2"), "UTF-8");
+      return URLDecoder.decode(params.replace("&", "\t")
+          .replaceAll(EXCLUDE, "")
+          .replaceAll(PASSWORD, "$1=*$2")
+          .replaceAll(CARD_NUMBER, "$1=*$2")
+          .replaceAll(CVV, "$1=*$2"), "UTF-8");
     }
     catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);

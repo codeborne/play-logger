@@ -16,6 +16,18 @@ public class RequestLogPluginTest {
   }
 
   @Test
+  public void cvvIsMasked() throws Exception {
+    request.querystring = "?card.holderName=Some+Body&card.number=6789690444552800&card.validityMonth=07&card.validityYear=2015&card.cvv=907";
+    assertEquals("card.holderName=Some Body\tcard.number=*\tcard.validityMonth=07\tcard.validityYear=2015\tcard.cvv=*", RequestLogPlugin.extractParams(request));
+  }
+
+  @Test
+  public void cardNumberIsMasked() throws Exception {
+    request.querystring = "?card.number=6789 6904 4455 2800";
+    assertEquals("card.number=*", RequestLogPlugin.extractParams(request));
+  }
+
+  @Test
   public void postParametersAreIncluded() throws Exception {
     request.querystring = "?id=123";
     request.contentType = "application/x-www-form-urlencoded";
