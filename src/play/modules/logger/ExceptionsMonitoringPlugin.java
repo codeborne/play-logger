@@ -5,6 +5,7 @@ import play.exceptions.ActionNotFoundException;
 import play.exceptions.JavaExecutionException;
 import play.exceptions.UnexpectedException;
 
+import javax.persistence.PersistenceException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +24,12 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
   public static void register(Throwable e) {
     if (e instanceof ActionNotFoundException) return;
-    if (e instanceof UnexpectedException || e instanceof InvocationTargetException || e instanceof JavaExecutionException) e = e.getCause();
+    if (e instanceof UnexpectedException ||
+        e instanceof InvocationTargetException ||
+        e instanceof JavaExecutionException ||
+        e instanceof PersistenceException) {
+      if (e.getCause() != null) e = e.getCause();
+    }
     String key = e.toString().split("\n")[0];
     AtomicInteger value = exceptions.get(key);
     if (value == null) exceptions.put(key, value = new AtomicInteger());
