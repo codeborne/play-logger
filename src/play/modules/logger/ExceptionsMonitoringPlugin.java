@@ -56,4 +56,8 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
     return sw.toString();
   }
+
+  public static ConcurrentHashMap<String, AtomicInteger> getExceptions() {
+    return exceptions;
+  }
 }
