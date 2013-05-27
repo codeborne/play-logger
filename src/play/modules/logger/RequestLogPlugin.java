@@ -10,6 +10,7 @@ import play.mvc.results.Result;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -19,10 +20,8 @@ public class RequestLogPlugin extends PlayPlugin {
   private static AtomicInteger counter = new AtomicInteger(1);
   private static Logger logger = LoggerFactory.getLogger("request");
 
-  static final String EXCLUDE = "(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)";
-  static final String PASSWORD = "(?i)(.*?password.*?)=.*?(\t|$)";
-  static final String CVV = "(?i)(.*?card\\.cvv*?)=.*?(\t|$)";
-  static final String CARD_NUMBER = "(?i)(.*?card\\.number*?)=.*?(\t|$)";
+  static final Pattern EXCLUDE = Pattern.compile("(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)");
+  static final Pattern PASSWORD = Pattern.compile("(?i)(.*?(?=password|card\\.cvv|card\\.number).*?)=.*?(\t|$)");
 
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
@@ -55,11 +54,10 @@ public class RequestLogPlugin extends PlayPlugin {
       if (params.startsWith("?")) params = params.substring(1);
       if ("application/x-www-form-urlencoded".equals(request.contentType))
         params += (isNotEmpty(params) ? "\t" : "") + request.params.get("body");
-      return URLDecoder.decode(params.replace("&", "\t")
-          .replaceAll(EXCLUDE, "")
-          .replaceAll(PASSWORD, "$1=*$2")
-          .replaceAll(CARD_NUMBER, "$1=*$2")
-          .replaceAll(CVV, "$1=*$2"), "UTF-8");
+      params = params.replace("&", "\t");
+      params = EXCLUDE.matcher(params).replaceAll("");
+      params = PASSWORD.matcher(params).replaceAll("$1=*$2");
+      return URLDecoder.decode(params, "UTF-8");
     }
     catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
