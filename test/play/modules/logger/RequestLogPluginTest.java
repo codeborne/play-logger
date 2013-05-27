@@ -1,13 +1,22 @@
 package play.modules.logger;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
+import play.Play;
 import play.mvc.Http;
+
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
 public class RequestLogPluginTest {
   @SuppressWarnings("deprecation")
   Http.Request request = new Http.Request();
+
+  @BeforeClass
+  public static void setUp() throws Exception {
+    Play.configuration = new Properties();
+  }
 
   @Test
   public void passwordIsMasked() throws Exception {

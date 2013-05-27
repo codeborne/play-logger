@@ -2,6 +2,7 @@ package play.modules.logger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.Play;
 import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
@@ -16,16 +17,17 @@ import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 public class RequestLogPlugin extends PlayPlugin {
-  private static String prefix = Integer.toHexString((int)(Math.random() * 0x1000));
-  private static AtomicInteger counter = new AtomicInteger(1);
-  private static Logger logger = LoggerFactory.getLogger("request");
+  static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
+  static final AtomicInteger counter = new AtomicInteger(1);
+  static final Logger logger = LoggerFactory.getLogger("request");
 
+  static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
   static final Pattern EXCLUDE = Pattern.compile("(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)");
-  static final Pattern PASSWORD = Pattern.compile("(?i)(.*?(?=password|card\\.cvv|card\\.number).*?)=.*?(\t|$)");
+  static final Pattern MASK = Pattern.compile("(?i)(.*?(?=" + Play.configuration.getProperty("request.log.maskParams", "password|card\\.cvv|card\\.number") + ").*?)=.*?(\t|$)");
 
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
-    request.args.put("requestId", prefix + "-" + counter.incrementAndGet());
+    request.args.put("requestId", REQUEST_ID_PREFIX + "-" + counter.incrementAndGet());
   }
 
   @Override public void onActionInvocationResult(Result result) {
@@ -38,7 +40,7 @@ public class RequestLogPlugin extends PlayPlugin {
     long start = (Long)request.args.get("startTime");
 
     StringBuilder line = new StringBuilder()
-      .append(request.action).append(' ')
+      .append(request.action.startsWith(LOG_AS_PATH) ? request.path : request.action).append(' ')
       .append(request.remoteAddress).append(' ')
       .append(session.getId()).append(' ')
       .append(extractParams(request))
@@ -56,7 +58,7 @@ public class RequestLogPlugin extends PlayPlugin {
         params += (isNotEmpty(params) ? "\t" : "") + request.params.get("body");
       params = params.replace("&", "\t");
       params = EXCLUDE.matcher(params).replaceAll("");
-      params = PASSWORD.matcher(params).replaceAll("$1=*$2");
+      params = MASK.matcher(params).replaceAll("$1=*$2");
       return URLDecoder.decode(params, "UTF-8");
     }
     catch (UnsupportedEncodingException e) {
