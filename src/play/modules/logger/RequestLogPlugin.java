@@ -8,13 +8,12 @@ import play.mvc.Http;
 import play.mvc.Scope;
 import play.mvc.results.Result;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 public class RequestLogPlugin extends PlayPlugin {
   static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
@@ -42,7 +41,7 @@ public class RequestLogPlugin extends PlayPlugin {
     StringBuilder line = new StringBuilder()
       .append(request.action.startsWith(LOG_AS_PATH) ? request.path : request.action).append(' ')
       .append(request.remoteAddress).append(' ')
-      .append(session.getId()).append(' ')
+      .append(session.getId())
       .append(extractParams(request))
       .append(" -> ").append(result.getClass().getSimpleName())
       .append(' ').append(currentTimeMillis() - start).append(" ms");
@@ -51,18 +50,15 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   static String extractParams(Http.Request request) {
-    try {
-      String params = request.querystring;
-      if (params.startsWith("?")) params = params.substring(1);
-      if ("application/x-www-form-urlencoded".equals(request.contentType))
-        params += (isNotEmpty(params) ? "\t" : "") + request.params.get("body");
-      params = params.replace("&", "\t");
-      params = EXCLUDE.matcher(params).replaceAll("");
-      params = MASK.matcher(params).replaceAll("$1=*$2");
-      return URLDecoder.decode(params, "UTF-8");
+    StringBuilder sb = new StringBuilder();
+    for (Map.Entry<String, String[]> param : request.params.all().entrySet()) {
+      sb.append('\t').append(param.getKey()).append('=');
+      if (param.getValue().length == 1) sb.append(param.getValue()[0]);
+      else sb.append(Arrays.toString(param.getValue()));
     }
-    catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+
+    String params = EXCLUDE.matcher(sb).replaceAll("");
+    params = MASK.matcher(params).replaceAll("$1=*$2");
+    return params;
   }
 }
