@@ -52,6 +52,7 @@ public class RequestLogPlugin extends PlayPlugin {
   static String extractParams(Http.Request request) {
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<String, String[]> param : request.params.all().entrySet()) {
+      if (param.getKey().equals("body") || param.getKey().equals("action") || param.getKey().equals("controller")) continue;
       sb.append('\t').append(param.getKey()).append('=');
       if (param.getValue().length == 1) sb.append(param.getValue()[0]);
       else sb.append(Arrays.toString(param.getValue()));
