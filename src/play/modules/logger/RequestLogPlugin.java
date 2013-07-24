@@ -42,7 +42,7 @@ public class RequestLogPlugin extends PlayPlugin {
       .append(request.action.startsWith(LOG_AS_PATH) ? request.path : request.action).append(' ')
       .append(request.remoteAddress).append(' ')
       .append(session.getId())
-      .append(extractParams(request))
+      .append(' ').append(extractParams(request))
       .append(" -> ").append(result.getClass().getSimpleName())
       .append(' ').append(currentTimeMillis() - start).append(" ms");
 
@@ -60,6 +60,6 @@ public class RequestLogPlugin extends PlayPlugin {
 
     String params = EXCLUDE.matcher(sb).replaceAll("");
     params = MASK.matcher(params).replaceAll("$1=*$2");
-    return params;
+    return params.trim();
   }
 }
