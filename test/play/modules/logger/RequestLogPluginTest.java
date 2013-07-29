@@ -30,8 +30,8 @@ public class RequestLogPluginTest {
 
   @Test
   public void cvvIsMasked() throws Exception {
-    setQueryString("card.holderName=Some+Body&card.number=6789690444552800&card.validityMonth=07&card.validityYear=2015&card.cvv=907");
-    assertEquals("card.validityYear=2015\tcard.cvv=*\tcard.number=*\tcard.validityMonth=07\tcard.holderName=Some Body", RequestLogPlugin.extractParams(request));
+    setQueryString("card.holderName=Some+Body&card.number=6789690444552800&card.validityMonth=07&card.validityYear=2015&card.cvv=907&cvv=600");
+    assertEquals("card.validityYear=2015\tcard.cvv=*\tcvv=*\tcard.number=*\tcard.validityMonth=07\tcard.holderName=Some Body", RequestLogPlugin.extractParams(request));
   }
 
   @Test
