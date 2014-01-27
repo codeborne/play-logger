@@ -16,7 +16,7 @@ public class ExtendedPatternLayout extends org.apache.log4j.PatternLayout {
   @Override
   protected PatternParser createPatternParser(String pattern) {
     return new PatternParser(pattern) {
-      protected void finalizeConverter(char c) {
+      @Override protected void finalizeConverter(char c) {
         if (c == 'h') {
           addConverter(new HeapSizePatternConverter());
         }
@@ -31,7 +31,7 @@ public class ExtendedPatternLayout extends org.apache.log4j.PatternLayout {
   }
 
   static class HeapSizePatternConverter extends PatternConverter {
-    protected String convert(LoggingEvent event) {
+    @Override protected String convert(LoggingEvent event) {
       Runtime runtime = Runtime.getRuntime();
       long used = runtime.totalMemory() - runtime.freeMemory();
       return (used / 1024 / 1024 + 1) + "MB";
@@ -39,7 +39,7 @@ public class ExtendedPatternLayout extends org.apache.log4j.PatternLayout {
   }
 
   static class RequestIdPatternConverter extends PatternConverter {
-    protected String convert(LoggingEvent event) {
+    @Override protected String convert(LoggingEvent event) {
       Http.Request request = Http.Request.current();
       if (request == null) return "job";
       Object rid = request.args.get("requestId");

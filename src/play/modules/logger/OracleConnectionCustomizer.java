@@ -34,13 +34,13 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
     }
   }
 
-  @Override public void onAcquire(Connection conn, String s) throws Exception {
+  @Override public void onAcquire(Connection conn, String s) {
   }
 
-  @Override public void onDestroy(Connection conn, String s) throws Exception {
+  @Override public void onDestroy(Connection conn, String s) {
   }
 
-  @Override public void onCheckOut(Connection conn, String s) throws Exception {
+  @Override public void onCheckOut(Connection conn, String s) {
     if (setEndToEndMetrics == null) return;
     try {
       String e2eMetrics[] = new String[arrayLength];
@@ -56,6 +56,6 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
     }
   }
 
-  @Override public void onCheckIn(Connection conn, String s) throws Exception {
+  @Override public void onCheckIn(Connection conn, String s) {
   }
 }
