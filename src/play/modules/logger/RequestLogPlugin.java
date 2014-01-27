@@ -22,7 +22,7 @@ public class RequestLogPlugin extends PlayPlugin {
 
   static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
   static final Pattern EXCLUDE = Pattern.compile("(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)");
-  static final Pattern MASK = Pattern.compile("(?i)(.*?(?=" + Play.configuration.getProperty("request.log.maskParams", "password|cvv|card\\.number") + ").*?)=.*?(\t|$)");
+  static final Pattern MASK = Pattern.compile("(?i)(.*?(?=" + Play.configuration.getProperty("request.log.maskParams", "password|cvv|card\\.cvv|card\\.number") + ").*?)=.*?(\t|$)");
 
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
