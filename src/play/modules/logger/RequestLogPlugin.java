@@ -16,13 +16,13 @@ import java.util.regex.Pattern;
 import static java.lang.System.currentTimeMillis;
 
 public class RequestLogPlugin extends PlayPlugin {
-  static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
-  static final AtomicInteger counter = new AtomicInteger(1);
-  static final Logger logger = LoggerFactory.getLogger("request");
+  private static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
+  private static final AtomicInteger counter = new AtomicInteger(1);
+  private static final Logger logger = LoggerFactory.getLogger("request");
 
-  static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
-  static final Pattern EXCLUDE = Pattern.compile("(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)");
-  static final Pattern MASK = Pattern.compile("(?i)(.*?(?=" + Play.configuration.getProperty("request.log.maskParams", "password|cvv|card\\.cvv|card\\.number") + ").*?)=.*?(\t|$)");
+  private static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
+  private static final Pattern EXCLUDE = Pattern.compile("(authenticityToken|action|controller|x-http-method-override)=.*?(\t|$)");
+  private static final Pattern MASK = Pattern.compile("(?i)(.*?(?=" + Play.configuration.getProperty("request.log.maskParams", "password|cvv|card\\.cvv|card\\.number") + ").*?)=.*?(\t|$)");
 
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
@@ -42,31 +42,28 @@ public class RequestLogPlugin extends PlayPlugin {
     Scope.Session session = Scope.Session.current();
     long start = (Long)request.args.get("startTime");
 
-    StringBuilder line = new StringBuilder()
-      .append(request.action.startsWith(LOG_AS_PATH) ? request.path : request.action).append(' ')
-      .append(request.remoteAddress).append(' ')
-      .append(session.getId())
-      .append(' ').append(extractParams(request))
-      .append(" -> ").append(result.getClass().getSimpleName())
-      .append(' ').append(currentTimeMillis() - start).append(" ms");
-
-    logger.info(line.toString());
+    logger.info(path(request) +
+        ' ' + request.remoteAddress +
+        ' ' + session.getId() +
+        ' ' + extractParams(request) +
+        " -> " + result.getClass().getSimpleName() +
+        ' ' + (currentTimeMillis() - start) + " ms");
   }
 
-  static void logRequestError(Throwable e) {
+  private static void logRequestError(Throwable e) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
     long start = (Long)request.args.get("startTime");
 
-    StringBuilder line = new StringBuilder()
-      .append(request.action.startsWith(LOG_AS_PATH) ? request.path : request.action).append(' ')
-      .append(request.remoteAddress).append(' ')
-      .append(session.getId())
-      .append(' ').append(extractParams(request))
-      .append(" -> ").append(e)
-      .append(' ').append(currentTimeMillis() - start).append(" ms");
+    logger.info(path(request) +
+        ' ' + request.remoteAddress +
+        ' ' + session.getId() +
+        ' ' + extractParams(request) +
+        " -> " + e + ' ' + (currentTimeMillis() - start) + " ms");
+  }
 
-    logger.info(line.toString());
+  private static String path(Http.Request request) {
+    return (request.action.startsWith(LOG_AS_PATH) ? request.path : request.action);
   }
 
   static String extractParams(Http.Request request) {
