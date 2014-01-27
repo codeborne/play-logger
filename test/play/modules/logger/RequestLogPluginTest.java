@@ -19,6 +19,7 @@ public class RequestLogPluginTest {
   @Before
   public void setUp() throws Exception {
     Play.configuration = new Properties();
+    Play.configuration.setProperty("request.log.maskParams", "password|cvv|card\\.cvv|card\\.number");
     Http.Request.current.set(request);
   }
 
