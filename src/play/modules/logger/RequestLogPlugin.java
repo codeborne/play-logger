@@ -64,7 +64,7 @@ public class RequestLogPlugin extends PlayPlugin {
         " -> " + e + ' ' + (currentTimeMillis() - start) + " ms");
   }
 
-  private static String getRequestLogCustomData(Http.Request request) {
+  static String getRequestLogCustomData(Http.Request request) {
     return request.args.containsKey("requestLogCustomData") ? " " + request.args.get("requestLogCustomData") : "";
   }
 

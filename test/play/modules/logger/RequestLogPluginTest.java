@@ -8,6 +8,7 @@ import play.mvc.Http;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
@@ -59,6 +60,16 @@ public class RequestLogPluginTest {
   public void paramsAreDecoded() {
     setQueryString("hello=A+B+%43");
     assertEquals("hello=A B C", RequestLogPlugin.extractParams(request));
+  }
+
+  @Test
+  public void customLogData() {
+    assertEquals("", RequestLogPlugin.getRequestLogCustomData(request));
+
+    request.args = new HashMap<>();
+    request.args.put("requestLogCustomData", "xtra");
+
+    assertEquals(" xtra", RequestLogPlugin.getRequestLogCustomData(request));
   }
 
   private void setQueryString(String params) {
