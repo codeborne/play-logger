@@ -45,6 +45,7 @@ public class RequestLogPlugin extends PlayPlugin {
     logger.info(path(request) +
         ' ' + request.remoteAddress +
         ' ' + session.getId() +
+        getRequestLogCustomData(request) +
         ' ' + extractParams(request) +
         " -> " + result.getClass().getSimpleName() +
         ' ' + (currentTimeMillis() - start) + " ms");
@@ -58,8 +59,13 @@ public class RequestLogPlugin extends PlayPlugin {
     logger.info(path(request) +
         ' ' + request.remoteAddress +
         ' ' + session.getId() +
+        getRequestLogCustomData(request) +
         ' ' + extractParams(request) +
         " -> " + e + ' ' + (currentTimeMillis() - start) + " ms");
+  }
+
+  private static String getRequestLogCustomData(Http.Request request) {
+    return request.args.containsKey("requestLogCustomData") ? " " + request.args.get("requestLogCustomData") : "";
   }
 
   private static String path(Http.Request request) {
