@@ -17,7 +17,7 @@ Add it to your dependencies.yml
 
     require:
         - play
-        - play-logger -> logger 0.3.2
+        - play-logger -> logger 1.1
     
     repositories:
         - play-logger:
