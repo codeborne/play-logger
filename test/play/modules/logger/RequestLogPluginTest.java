@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.junit.matchers.JUnitMatchers.containsString;
 
 public class RequestLogPluginTest {
   @SuppressWarnings("deprecation")
@@ -30,12 +29,12 @@ public class RequestLogPluginTest {
     setQueryString("username=anton&password=123&password2=456&newPassword=678&password=789&oldPassword=1693&age=12");
     String maskedParams = RequestLogPlugin.extractParams(request);
 
-    assertThat(maskedParams, containsString("username=anton"));
-    assertThat(maskedParams, containsString("age=12"));
-    assertThat(maskedParams, containsString("password2=*"));
-    assertThat(maskedParams, containsString("newPassword=*"));
-    assertThat(maskedParams, containsString("oldPassword=*"));
-    assertThat(maskedParams, containsString("password=*"));
+    assertTrue(maskedParams.contains("username=anton"));
+    assertTrue(maskedParams.contains("age=12"));
+    assertTrue(maskedParams.contains("password2=*"));
+    assertTrue(maskedParams.contains("newPassword=*"));
+    assertTrue(maskedParams.contains("oldPassword=*"));
+    assertTrue(maskedParams.contains("password=*"));
     assertFalse(maskedParams.contains("123"));
     assertFalse(maskedParams.contains("456"));
     assertFalse(maskedParams.contains("67"));
@@ -49,12 +48,12 @@ public class RequestLogPluginTest {
         "card.validityMonth=07&card.validityYear=2015&card.cvv=907&cvv=600");
     String maskedParams = RequestLogPlugin.extractParams(request);
 
-    assertThat(maskedParams, containsString("card.validityYear=2015"));
-    assertThat(maskedParams, containsString("card.validityMonth=07"));
-    assertThat(maskedParams, containsString("card.holderName=Some Body"));
-    assertThat(maskedParams, containsString("card.cvv=*"));
-    assertThat(maskedParams, containsString("cvv=*"));
-    assertThat(maskedParams, containsString("card.number=*"));
+    assertTrue(maskedParams.contains("card.validityYear=2015"));
+    assertTrue(maskedParams.contains("card.validityMonth=07"));
+    assertTrue(maskedParams.contains("card.holderName=Some Body"));
+    assertTrue(maskedParams.contains("card.cvv=*"));
+    assertTrue(maskedParams.contains("cvv=*"));
+    assertTrue(maskedParams.contains("card.number=*"));
     assertFalse(maskedParams.contains("6789690444552800"));
     assertFalse(maskedParams.contains("907"));
     assertFalse(maskedParams.contains("600"));
@@ -73,9 +72,9 @@ public class RequestLogPluginTest {
     request.body = new ByteArrayInputStream("password=456&x=y".getBytes());
     String maskedParams = RequestLogPlugin.extractParams(request);
 
-    assertThat(maskedParams, containsString("id=123"));
-    assertThat(maskedParams, containsString("password=*"));
-    assertThat(maskedParams, containsString("x=y"));
+    assertTrue(maskedParams.contains("id=123"));
+    assertTrue(maskedParams.contains("password=*"));
+    assertTrue(maskedParams.contains("x=y"));
     assertFalse(maskedParams.contains("456"));
   }
 
