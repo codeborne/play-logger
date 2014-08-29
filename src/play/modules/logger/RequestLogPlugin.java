@@ -6,6 +6,7 @@ import play.Play;
 import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
+import play.mvc.results.Redirect;
 import play.mvc.results.Result;
 
 import java.util.Arrays;
@@ -47,8 +48,14 @@ public class RequestLogPlugin extends PlayPlugin {
         ' ' + session.getId() +
         getRequestLogCustomData(request) +
         ' ' + extractParams(request) +
-        " -> " + result.getClass().getSimpleName() +
+        " -> " + result(result) +
         ' ' + (currentTimeMillis() - start) + " ms");
+  }
+
+  private static String result(Result result) {
+    return (result instanceof Redirect) ?
+        result.getClass().getSimpleName() + ((Redirect) result).url :
+        result.getClass().getSimpleName();
   }
 
   private static void logRequestError(Throwable e) {
