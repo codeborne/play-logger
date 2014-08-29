@@ -20,7 +20,7 @@ import static java.lang.String.format;
 
 public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
-  private static ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
 
   public static void register(Throwable e) {
     if (e instanceof ActionNotFoundException) return;
@@ -38,20 +38,21 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
   @Override public String getStatus() {
     StringWriter sw = new StringWriter();
-    PrintWriter out = new PrintWriter(sw);
+    try (PrintWriter out = new PrintWriter(sw)) {
 
-    out.println("Exceptions statistics:");
-    out.println("~~~~~~~~~~~~~~~~~~~~~~");
+      out.println("Exceptions statistics:");
+      out.println("~~~~~~~~~~~~~~~~~~~~~~");
 
-    ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
-    Collections.sort(sorted, new Comparator<Map.Entry<String, AtomicInteger>>() {
-      @Override public int compare(Map.Entry<String, AtomicInteger> o1, Map.Entry<String, AtomicInteger> o2) {
-        return o2.getValue().get() - o1.getValue().get();
+      ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
+      Collections.sort(sorted, new Comparator<Map.Entry<String, AtomicInteger>>() {
+        @Override public int compare(Map.Entry<String, AtomicInteger> o1, Map.Entry<String, AtomicInteger> o2) {
+          return Integer.compare(o2.getValue().get(), o1.getValue().get());
+        }
+      });
+
+      for (Map.Entry<String, AtomicInteger> entry : sorted) {
+        out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
       }
-    });
-
-    for (Map.Entry<String, AtomicInteger> entry : sorted) {
-      out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
     }
 
     return sw.toString();

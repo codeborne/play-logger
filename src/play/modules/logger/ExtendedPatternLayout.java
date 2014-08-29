@@ -1,11 +1,12 @@
 package play.modules.logger;
 
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.helpers.PatternConverter;
 import org.apache.log4j.helpers.PatternParser;
 import org.apache.log4j.spi.LoggingEvent;
 import play.mvc.Http;
 
-public class ExtendedPatternLayout extends org.apache.log4j.PatternLayout {
+public class ExtendedPatternLayout extends PatternLayout {
   public ExtendedPatternLayout() {
   }
 

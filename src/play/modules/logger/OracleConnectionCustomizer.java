@@ -43,7 +43,7 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
   @Override public void onCheckOut(Connection conn, String s) {
     if (setEndToEndMetrics == null) return;
     try {
-      String e2eMetrics[] = new String[arrayLength];
+      String[] e2eMetrics = new String[arrayLength];
       Http.Request request = Http.Request.current();
       e2eMetrics[actionIndex] = request != null ? (String) request.args.get("requestId") : null; // set by RequestLogPlugin
       e2eMetrics[moduleIndex] = "IBANK/" + Thread.currentThread().getName();
@@ -51,8 +51,11 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
       e2eMetrics[clientIdIndex] = session != null ? session.get("username") : null;
       setEndToEndMetrics.invoke(conn, e2eMetrics, (short) 0);
     }
+    catch (InvocationTargetException e) {
+      Logger.warn("Cannot set Oracle end-to-end metrics", e.getCause());
+    }
     catch (Exception e) {
-      Logger.warn("Cannot set Oracle end-to-end metrics", e instanceof InvocationTargetException ? e.getCause() : e);
+      Logger.warn("Cannot set Oracle end-to-end metrics", e);
     }
   }
 
