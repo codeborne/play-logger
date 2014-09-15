@@ -54,7 +54,7 @@ public class RequestLogPlugin extends PlayPlugin {
 
   private static String result(Result result) {
     return (result instanceof Redirect) ?
-        result.getClass().getSimpleName() + ((Redirect) result).url :
+        result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
         result.getClass().getSimpleName();
   }
 
