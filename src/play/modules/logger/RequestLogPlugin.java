@@ -81,7 +81,7 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   private static String path(Http.Request request) {
-    return request.action.startsWith(LOG_AS_PATH) ? request.path : request.action;
+    return request.action != null && request.action.startsWith(LOG_AS_PATH) ? request.path : request.action;
   }
 
   static String extractParams(Http.Request request) {
