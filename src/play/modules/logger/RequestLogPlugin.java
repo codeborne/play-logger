@@ -41,7 +41,12 @@ public class RequestLogPlugin extends PlayPlugin {
   static void logRequestInfo(Result result) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
-    long start = (Long)request.args.get("startTime");
+    
+    String executionTime = "";
+    if (request != null && request.args != null) {
+      Long start = (Long) request.args.get("startTime");
+      if (start != null) executionTime = " " + (currentTimeMillis() - start) + " ms";
+    }
 
     logger.info(path(request) +
         ' ' + request.remoteAddress +
@@ -49,7 +54,7 @@ public class RequestLogPlugin extends PlayPlugin {
         getRequestLogCustomData(request) +
         ' ' + extractParams(request) +
         " -> " + result(result) +
-        ' ' + (currentTimeMillis() - start) + " ms");
+        executionTime);
   }
 
   private static String result(Result result) {
