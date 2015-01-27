@@ -1,7 +1,8 @@
 package play.modules.logger;
 
 import com.mchange.v2.c3p0.ConnectionCustomizer;
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 import play.mvc.Scope;
 
@@ -13,6 +14,8 @@ import java.sql.Connection;
  * Can be used with C3P0 in order to see who is using Oracle connections on the DB side (End to End metrics)
  */
 public class OracleConnectionCustomizer implements ConnectionCustomizer {
+  private static final Logger logger = LoggerFactory.getLogger(OracleConnectionCustomizer.class);
+
   int arrayLength;
   int actionIndex;
   int moduleIndex;
@@ -30,7 +33,7 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
       setEndToEndMetrics.setAccessible(true);
     }
     catch (Exception e) {
-      Logger.warn("Cannot access OracleConnection fields", e);
+      logger.warn("Cannot access OracleConnection fields", e);
     }
   }
 
@@ -52,10 +55,10 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
       setEndToEndMetrics.invoke(conn, e2eMetrics, (short) 0);
     }
     catch (InvocationTargetException e) {
-      Logger.warn("Cannot set Oracle end-to-end metrics", e.getCause());
+      logger.warn("Cannot set Oracle end-to-end metrics", e.getCause());
     }
     catch (Exception e) {
-      Logger.warn("Cannot set Oracle end-to-end metrics", e);
+      logger.warn("Cannot set Oracle end-to-end metrics", e);
     }
   }
 

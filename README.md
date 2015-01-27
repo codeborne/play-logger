@@ -17,12 +17,12 @@ Add it to your dependencies.yml
 
     require:
         - play
-        - play-logger -> logger 1.2
+        - play-logger -> logger 1.2.3
     
     repositories:
         - play-logger:
           type: http
-          artifact: http://repo.codeborne.com/play-logger/[module]-[revision].zip
+          artifact: https://repo.codeborne.com/play-logger/[module]-[revision].zip
           contains:
             - play-logger -> *
 
