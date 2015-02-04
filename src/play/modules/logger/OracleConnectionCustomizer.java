@@ -10,6 +10,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 
+import static org.apache.commons.lang.StringUtils.substring;
+
 /**
  * Can be used with C3P0 in order to see who is using Oracle connections on the DB side (End to End metrics)
  */
@@ -49,7 +51,7 @@ public class OracleConnectionCustomizer implements ConnectionCustomizer {
       String[] e2eMetrics = new String[arrayLength];
       Http.Request request = Http.Request.current();
       e2eMetrics[actionIndex] = request != null ? (String) request.args.get("requestId") : null; // set by RequestLogPlugin
-      e2eMetrics[moduleIndex] = "IBANK/" + Thread.currentThread().getName();
+      e2eMetrics[moduleIndex] = substring("IBANK/" + Thread.currentThread().getName(), 0, 64);
       Scope.Session session = Scope.Session.current();
       e2eMetrics[clientIdIndex] = session != null ? session.get("username") : null;
       setEndToEndMetrics.invoke(conn, e2eMetrics, (short) 0);
