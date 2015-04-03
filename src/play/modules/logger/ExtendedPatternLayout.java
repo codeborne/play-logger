@@ -42,9 +42,9 @@ public class ExtendedPatternLayout extends PatternLayout {
   static class RequestIdPatternConverter extends PatternConverter {
     @Override protected String convert(LoggingEvent event) {
       Http.Request request = Http.Request.current();
-      if (request == null) return "job";
+      if (request == null) return "job " + Thread.currentThread().getName();
       Object rid = request.args.get("requestId");
-      return rid == null ? "unknown" : rid.toString();
+      return rid == null ? Thread.currentThread().getName() : rid.toString();
     }
   }
 }

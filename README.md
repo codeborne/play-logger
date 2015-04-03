@@ -17,14 +17,14 @@ Add it to your dependencies.yml
 
     require:
         - play
-        - play-logger -> logger 1.4
+        - play-codeborne -> logger 1.5
     
     repositories:
         - play-logger:
           type: http
           artifact: https://repo.codeborne.com/play-logger/[module]-[revision].zip
           contains:
-            - play-logger -> *
+            - play-codeborne -> *
 
 Use it in your log4j.xml configuration
 --------------------------------------
