@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.Integer.compare;
 import static java.lang.String.format;
 import static java.util.Collections.sort;
+import static org.apache.commons.lang.StringUtils.split;
 
 public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
@@ -37,7 +38,7 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
   }
 
   static String key(Throwable e) {
-    return e.toString().split("\n")[0];
+    return split(e.toString(), '\n')[0].replaceAll("[\\d*]{3,}", "*");
   }
 
   @Override public String getStatus() {
