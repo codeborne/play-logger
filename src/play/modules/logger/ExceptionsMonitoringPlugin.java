@@ -10,13 +10,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Integer.compare;
 import static java.lang.String.format;
+import static java.util.Collections.sort;
 
 public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
@@ -30,25 +30,25 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
         e instanceof PersistenceException) {
       if (e.getCause() != null) e = e.getCause();
     }
-    String key = e.toString().split("\n")[0];
+    String key = key(e);
     AtomicInteger value = exceptions.get(key);
     if (value == null) exceptions.put(key, value = new AtomicInteger());
     value.incrementAndGet();
+  }
+
+  static String key(Throwable e) {
+    return e.toString().split("\n")[0];
   }
 
   @Override public String getStatus() {
     StringWriter sw = new StringWriter();
     try (PrintWriter out = new PrintWriter(sw)) {
 
-      out.println("Exceptions statistics:");
+      out.println("Exception statistics:");
       out.println("~~~~~~~~~~~~~~~~~~~~~~");
 
       ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
-      Collections.sort(sorted, new Comparator<Map.Entry<String, AtomicInteger>>() {
-        @Override public int compare(Map.Entry<String, AtomicInteger> o1, Map.Entry<String, AtomicInteger> o2) {
-          return Integer.compare(o2.getValue().get(), o1.getValue().get());
-        }
-      });
+      sort(sorted, (o1, o2) -> compare(o2.getValue().get(), o1.getValue().get()));
 
       for (Map.Entry<String, AtomicInteger> entry : sorted) {
         out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
