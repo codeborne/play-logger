@@ -1,4 +1,4 @@
-self: play -> logger 1.6
+self: play -> logger 1.7
 
 require:
     - play 1.3+
