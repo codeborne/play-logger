@@ -39,10 +39,6 @@ public class RequestLogPlugin extends PlayPlugin {
     logRequestInfo(result);
   }
 
-  @Override public void onInvocationException(Throwable e) {
-    logRequestError(e);
-  }
-
   static void logRequestInfo(Result result) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
@@ -66,19 +62,6 @@ public class RequestLogPlugin extends PlayPlugin {
     return (result instanceof Redirect) ?
         result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
         result.getClass().getSimpleName();
-  }
-
-  private static void logRequestError(Throwable e) {
-    Http.Request request = Http.Request.current();
-    Scope.Session session = Scope.Session.current();
-    long start = (Long)request.args.get("startTime");
-
-    logger.info(path(request) +
-        ' ' + request.remoteAddress +
-        ' ' + session.getId() +
-        getRequestLogCustomData(request) +
-        ' ' + extractParams(request) +
-        " -> " + e + ' ' + (currentTimeMillis() - start) + " ms");
   }
 
   static String getRequestLogCustomData(Http.Request request) {
