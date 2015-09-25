@@ -42,10 +42,10 @@
   <target name="compile" depends="check, init">
     <mkdir dir="tmp/classes"/>
     <mkdir dir="tmp/test-classes"/>
-    <javac srcdir="src" destdir="tmp/classes" target="1.7" source="1.7" debug="true">
+    <javac srcdir="src" destdir="tmp/classes" target="1.8" source="1.8" debug="true">
       <classpath refid="project.classpath"/>
     </javac>
-    <javac srcdir="test" destdir="tmp/test-classes" target="1.7" source="1.7" debug="true">
+    <javac srcdir="test" destdir="tmp/test-classes" target="1.8" source="1.8" debug="true">
       <classpath>
         <path path="tmp/classes"/>
         <path refid="project.classpath"/>
