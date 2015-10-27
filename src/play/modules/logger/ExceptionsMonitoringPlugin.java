@@ -23,7 +23,7 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
   private static final ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
 
-  public static void register(Throwable e) {
+  public static void register(String source, Throwable e) {
     if (e instanceof ActionNotFoundException) return;
     if (e instanceof UnexpectedException ||
         e instanceof InvocationTargetException ||
@@ -31,7 +31,7 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
         e instanceof PersistenceException) {
       if (e.getCause() != null) e = e.getCause();
     }
-    String key = key(e);
+    String key = "[" + source + "] " + key(e);
     AtomicInteger value = exceptions.get(key);
     if (value == null) exceptions.put(key, value = new AtomicInteger());
     value.incrementAndGet();

@@ -1,7 +1,7 @@
 play-logger
 ===========
 
-Play framework 1.x module for enterprise-grade request logging.
+Play framework 1.3.x module for enterprise-grade request logging.
 
 Features
 --------
@@ -17,7 +17,7 @@ Add it to your dependencies.yml
 
     require:
         - play
-        - play-codeborne -> logger 1.7
+        - play-codeborne -> logger 1.8
     
     repositories:
         - play-logger:
