@@ -9,6 +9,7 @@ import play.mvc.Scope;
 import play.mvc.results.Redirect;
 import play.mvc.results.Result;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,8 +24,9 @@ public class RequestLogPlugin extends PlayPlugin {
   private static final AtomicInteger counter = new AtomicInteger(1);
   private static final Logger logger = LoggerFactory.getLogger("request");
 
-  @SuppressWarnings("NonFinalStaticVariableUsedInClassInitialization")
   private static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
+  
+  private static final ThreadLocal<String> originalThreadName = new ThreadLocal<>();
 
   @Override public void onConfigurationRead() {
     initMaskedParams();
@@ -33,6 +35,16 @@ public class RequestLogPlugin extends PlayPlugin {
   @Override public void routeRequest(Http.Request request) {
     request.args.put("startTime", currentTimeMillis());
     request.args.put("requestId", REQUEST_ID_PREFIX + "-" + counter.incrementAndGet());
+  }
+
+  @Override public void beforeActionInvocation(Method actionMethod) {
+    originalThreadName.set(Thread.currentThread().getName());
+    Thread.currentThread().setName(Thread.currentThread().getName() + " " + Http.Request.current().action);
+  }
+
+  @Override public void afterActionInvocation() {
+    Thread.currentThread().setName(originalThreadName.get());
+    originalThreadName.remove();
   }
 
   @Override public void onActionInvocationResult(Result result) {
