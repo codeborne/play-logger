@@ -62,4 +62,8 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
   public static Map<String, AtomicInteger> getExceptions() {
     return exceptions;
   }
+  
+  public static void resetExceptions() {
+    exceptions.clear();
+  }
 }

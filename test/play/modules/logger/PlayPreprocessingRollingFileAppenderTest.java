@@ -2,6 +2,7 @@ package play.modules.logger;
 
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.SocketTimeoutException;
@@ -13,6 +14,11 @@ import static org.mockito.Mockito.mock;
 public class PlayPreprocessingRollingFileAppenderTest {
 
   PlayPreprocessingRollingFileAppender appender = new PlayPreprocessingRollingFileAppender();
+
+  @Before
+  public void setUp() {
+    ExceptionsMonitoringPlugin.resetExceptions();
+  }
 
   @Test
   public void extractsErrorSourceFromLoggerName() {
