@@ -43,8 +43,10 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   @Override public void afterActionInvocation() {
-    Thread.currentThread().setName(originalThreadName.get());
-    originalThreadName.remove();
+    if (originalThreadName.get() != null) { // Play doesn't call beforeActionInvocation() on static resources
+      Thread.currentThread().setName(originalThreadName.get());
+      originalThreadName.remove();
+    }
   }
 
   @Override public void onActionInvocationResult(Result result) {
