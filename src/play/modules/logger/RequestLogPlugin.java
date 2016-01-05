@@ -26,8 +26,6 @@ public class RequestLogPlugin extends PlayPlugin {
 
   private static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
   
-  private static final ThreadLocal<String> originalThreadName = new ThreadLocal<>();
-
   @Override public void onConfigurationRead() {
     initMaskedParams();
   }
@@ -38,15 +36,17 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   @Override public void beforeActionInvocation(Method actionMethod) {
-    originalThreadName.set(Thread.currentThread().getName());
-    Thread.currentThread().setName(Thread.currentThread().getName() + " " + Http.Request.current().action);
+    Thread.currentThread().setName(getOriginalThreadName() + " " + Http.Request.current().action);
   }
 
   @Override public void afterActionInvocation() {
-    if (originalThreadName.get() != null) { // Play doesn't call beforeActionInvocation() on static resources
-      Thread.currentThread().setName(originalThreadName.get());
-      originalThreadName.remove();
-    }
+    Thread.currentThread().setName(getOriginalThreadName());
+  }
+
+  private String getOriginalThreadName() {
+    String name = Thread.currentThread().getName();
+    int i = name.indexOf(' ');
+    return i == -1 ? name : name.substring(0, i);
   }
 
   @Override public void onActionInvocationResult(Result result) {

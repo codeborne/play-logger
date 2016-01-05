@@ -101,6 +101,31 @@ public class RequestLogPluginTest {
     assertEquals(" xtra", RequestLogPlugin.getRequestLogCustomData(request));
   }
 
+  @Test
+  public void setsCurrentThreadName_by_actionName() {
+    request.action = "Payments.history";
+    Thread.currentThread().setName("play-thread-666");
+
+    new RequestLogPlugin().beforeActionInvocation(null);
+    assertEquals("play-thread-666 Payments.history", Thread.currentThread().getName());
+  }
+
+  @Test
+  public void ignoresPreviouslySetThreadName_if_itWasNotResetForWhateverReason() {
+    request.action = "Payments.history";
+    Thread.currentThread().setName("play-thread-1 Bank.statement");
+
+    new RequestLogPlugin().beforeActionInvocation(null);
+    assertEquals("play-thread-1 Payments.history", Thread.currentThread().getName());
+  }
+
+  @Test
+  public void resetsCurrentThreadName_after_actionInvocation() {
+    Thread.currentThread().setName("play-thread-007 Payments.history");
+    new RequestLogPlugin().afterActionInvocation();
+    assertEquals("play-thread-007", Thread.currentThread().getName());
+  }
+
   private void setQueryString(String params) {
     try {
       request.params.data.putAll(UrlEncodedParser.parseQueryString(new ByteArrayInputStream(params.getBytes("UTF-8"))));
