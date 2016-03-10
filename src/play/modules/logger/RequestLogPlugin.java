@@ -49,8 +49,13 @@ public class RequestLogPlugin extends PlayPlugin {
     return i == -1 ? name : name.substring(0, i);
   }
 
-  @Override public void onActionInvocationResult(Result result) {
+  @Override public void onActionInvocationFinally() {
+    Result result = (Result) Http.Request.current().args.get("play.modules.logger.Result");
     logRequestInfo(result);
+  }
+
+  @Override public void onActionInvocationResult(Result result) {
+    Http.Request.current().args.put("play.modules.logger.Result", result);
   }
 
   static void logRequestInfo(Result result) {
@@ -73,7 +78,9 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   private static String result(Result result) {
-    return (result instanceof Redirect) ?
+    return result == null ?
+      "RenderError" :
+      (result instanceof Redirect) ?
         result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
         result.getClass().getSimpleName();
   }
