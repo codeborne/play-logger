@@ -31,7 +31,7 @@ public class ExtendedPatternLayout extends PatternLayout {
     };
   }
 
-  static class HeapSizePatternConverter extends PatternConverter {
+  private static class HeapSizePatternConverter extends PatternConverter {
     @Override protected String convert(LoggingEvent event) {
       Runtime runtime = Runtime.getRuntime();
       long used = runtime.totalMemory() - runtime.freeMemory();
@@ -39,7 +39,7 @@ public class ExtendedPatternLayout extends PatternLayout {
     }
   }
 
-  static class RequestIdPatternConverter extends PatternConverter {
+  private static class RequestIdPatternConverter extends PatternConverter {
     @Override protected String convert(LoggingEvent event) {
       String threadName = Thread.currentThread().getName();
       Http.Request request = Http.Request.current();
