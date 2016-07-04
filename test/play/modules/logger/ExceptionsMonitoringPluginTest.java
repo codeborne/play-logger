@@ -3,37 +3,49 @@ package play.modules.logger;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static play.modules.logger.ExceptionsMonitoringPlugin.key;
 
 public class ExceptionsMonitoringPluginTest {
+
   @Test
-  public void key() {
-    assertEquals("java.lang.IllegalStateException: Hello", ExceptionsMonitoringPlugin.key(new IllegalStateException("Hello\nWorld")));
+  public void keyTakes1stLine() {
+    assertEquals("java.lang.IllegalStateException: Hello", key(new IllegalStateException("Hello\nWorld")));
+  }
+
+  @Test
+  public void keyFromObjectHashcode() throws Exception {
+    assertEquals("java.lang.RuntimeException: while closing c3p0.impl.NewPooledConnection@*",
+        key(new RuntimeException("while closing c3p0.impl.NewPooledConnection@7ead1")));
+
+    assertEquals("java.lang.RuntimeException: while closing c3p0.impl.NewPooledConnection@* aaa",
+        key(new RuntimeException("while closing c3p0.impl.NewPooledConnection@7ead1 aaa")));
+
+    assertEquals("java.lang.RuntimeException: while closing c3p0.impl.NewPooledConnection@* aaa",
+        key(new RuntimeException("while closing c3p0.impl.NewPooledConnection@1234d aaa")));
   }
 
   @Test
   public void keyWithSpecificNumbers() {
-    assertEquals("java.lang.RuntimeException: Card '* - 0' not found or doesn't belong to 'CODEBFIMI' clerk access group " +
-        "or issued by restricted institution or disabled by VIP access configuration",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Card '964301******1706 - 0' not found or doesn't " +
-            "belong to 'CODEBFIMI' clerk access group or issued by restricted institution or disabled by VIP access configuration")));
+    assertEquals("java.lang.RuntimeException: Card '* - 0' not found or doesn't belong to 'CODEBFIMI'",
+        key(new RuntimeException("Card '964301******1706 - 0' not found or doesn't belong to 'CODEBFIMI'")));
 
-    assertEquals("java.lang.RuntimeException: Не обнаружен клиент в списке обслуживаемых клиентов. dbo_id=*.",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Не обнаружен клиент в списке обслуживаемых клиентов. dbo_id=190398235334.")));
+    assertEquals("java.lang.RuntimeException: обслуживаемых клиентов. dbo_id=*.",
+        key(new RuntimeException("обслуживаемых клиентов. dbo_id=190398235334.")));
   }
 
   @Test
   public void keyWithSpecificFileName() {
-    assertEquals("java.lang.RuntimeException: Failed to store file * for SomeModel: *",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Failed to store file {{/etc/some/file name} with spaces/file.pdf}} for SomeModel: 12345678")));
+    assertEquals("java.lang.RuntimeException: file * for *",
+        key(new RuntimeException("file {{/etc/some} with spaces/file.pdf}} for 12345678")));
 
-    assertEquals("java.lang.RuntimeException: Failed to store file {{/etc/some/file name with spaces/file.pdf for SomeModel: *",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Failed to store file {{/etc/some/file name with spaces/file.pdf for SomeModel: 12345678")));
+    assertEquals("java.lang.RuntimeException: file {{/etc/some with spaces/file.pdf for *",
+        key(new RuntimeException("file {{/etc/some with spaces/file.pdf for 12345678")));
 
-    assertEquals("java.lang.RuntimeException: Failed to store file /etc/some/file name with spaces/file.pdf}} for SomeModel: *",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Failed to store file /etc/some/file name with spaces/file.pdf}} for SomeModel: 12345678")));
+    assertEquals("java.lang.RuntimeException: file /etc/some with spaces/file.pdf}} for *",
+        key(new RuntimeException("file /etc/some with spaces/file.pdf}} for 12345678")));
 
-    assertEquals("java.lang.RuntimeException: Failed to store file {/etc/some/file name with spaces/file.pdf} for SomeModel: *",
-        ExceptionsMonitoringPlugin.key(new RuntimeException("Failed to store file {/etc/some/file name with spaces/file.pdf} for SomeModel: 12345678")));
-
+    assertEquals("java.lang.RuntimeException: file {/etc/some with spaces/file.pdf} for *",
+        key(new RuntimeException("file {/etc/some with spaces/file.pdf} for 12345678")));
   }
+
 }

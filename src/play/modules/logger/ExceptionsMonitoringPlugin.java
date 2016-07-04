@@ -38,7 +38,10 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
   }
 
   static String key(Throwable e) {
-    return split(e.toString(), '\n')[0].replaceAll("[\\d*]{3,}", "*").replaceAll("\\{\\{.*\\}\\}", "*");
+    return split(e.toString(), '\n')[0]
+        .replaceAll("@[0-9a-f]{4,}", "@*")
+        .replaceAll("\\{\\{.*\\}\\}", "*")
+        .replaceAll("[\\d*]{3,}", "*");
   }
 
   @Override public String getStatus() {
