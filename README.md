@@ -17,7 +17,7 @@ Add it to your dependencies.yml
 
     require:
         - play
-        - play-codeborne -> logger 1.2
+        - play-codeborne -> logger 1.11
     
     repositories:
         - play-logger:
