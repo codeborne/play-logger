@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class CardNumberFilteringLayout extends ExtendedPatternLayout {
   private static final String MASK = "$1******$3";
-  private static final Pattern PATTERN = Pattern.compile("([0-9]{6})([0-9]{6,9})([0-9]{4})");
+  private static final Pattern PATTERN = Pattern.compile("\\b([0-9]{6})([0-9]{6,9})([0-9]{4})\\b");
 
   @Override
   public String format(LoggingEvent event) {
