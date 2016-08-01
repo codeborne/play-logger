@@ -98,7 +98,7 @@ public class RequestLogPlugin extends PlayPlugin {
   private static final Set<String> MASKED_PARAMS = new HashSet<>();
 
   private static void initMaskedParams() {
-    String maskedParamsString = Play.configuration.getProperty("request.log.maskParams", "password|cvv|card.cvv|card.number");
+    String maskedParamsString = Play.configuration.getProperty("request.log.maskParams", "password|cvv|cardNumber|card.cvv|card.number");
     for (String param : maskedParamsString.split("\\|")) MASKED_PARAMS.add(param.toLowerCase().trim());
   }
 
