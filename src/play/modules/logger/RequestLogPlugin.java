@@ -61,7 +61,11 @@ public class RequestLogPlugin extends PlayPlugin {
   static void logRequestInfo(Result result) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
-    
+
+    if (isAwait(request, result)) {
+      return;
+    }
+
     String executionTime = "";
     if (request != null && request.args != null) {
       Long start = (Long) request.args.get("startTime");
@@ -75,6 +79,10 @@ public class RequestLogPlugin extends PlayPlugin {
         ' ' + extractParams(request) +
         " -> " + result(result) +
         executionTime);
+  }
+
+  private static boolean isAwait(Http.Request request, Result result) {
+    return result == null && request.args.containsKey("__continuation");
   }
 
   private static String result(Result result) {
