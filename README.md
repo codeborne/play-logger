@@ -15,16 +15,18 @@ Features
 Add it to your dependencies.yml
 -------------------------------
 
-    require:
-        - play
-        - play-codeborne -> logger 1.15
-    
-    repositories:
-        - play-logger:
+```
+require:
+    - play
+    - play-codeborne -> logger 1.15
+
+repositories:
+    - play-logger:
           type: http
           artifact: https://repo.codeborne.com/play-logger/[module]-[revision].zip
           contains:
-            - play-codeborne -> *
+              - play-codeborne -> *
+```
 
 Use it in your log4j.xml configuration
 --------------------------------------
