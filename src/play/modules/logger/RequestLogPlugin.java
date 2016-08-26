@@ -49,7 +49,7 @@ public class RequestLogPlugin extends PlayPlugin {
     logger.info(line.toString());
   }
 
-  static String extractParams(Http.Request request) {
+  public static String extractParams(Http.Request request) {
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<String, String[]> param : request.params.all().entrySet()) {
       if (param.getKey().equals("body") || param.getKey().equals("action") || param.getKey().equals("controller")) continue;
