@@ -1,7 +1,7 @@
 play-logger
 ===========
 
-Play framework 1.x module for enterprise-grade request logging.
+Play framework 1.4.x module for enterprise-grade request logging.
 
 Features
 --------
@@ -15,20 +15,23 @@ Features
 Add it to your dependencies.yml
 -------------------------------
 
-    require:
-        - play
-        - play-logger -> logger 0.3.2
-    
-    repositories:
-        - play-logger:
+```
+require:
+    - play
+    - play-codeborne -> logger 1.15
+
+repositories:
+    - play-logger:
           type: http
-          artifact: http://repo.codeborne.com/play-logger/[module]-[revision].zip
+          artifact: https://repo.codeborne.com/play-logger/[module]-[revision].zip
           contains:
-            - play-logger -> *
+              - play-codeborne -> *
+```
 
 Use it in your log4j.xml configuration
 --------------------------------------
-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
     <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
       <appender name="request" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="logs/request.log"/>

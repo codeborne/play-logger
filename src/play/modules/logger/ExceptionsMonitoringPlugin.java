@@ -10,19 +10,20 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Integer.compare;
 import static java.lang.String.format;
+import static java.util.Collections.sort;
+import static org.apache.commons.lang.StringUtils.split;
 
 public class ExceptionsMonitoringPlugin extends PlayPlugin {
 
-  private static ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, AtomicInteger> exceptions = new ConcurrentHashMap<>();
 
-  public static void register(Throwable e) {
+  public static void register(String source, Throwable e) {
     if (e instanceof ActionNotFoundException) return;
     if (e instanceof UnexpectedException ||
         e instanceof InvocationTargetException ||
@@ -30,34 +31,42 @@ public class ExceptionsMonitoringPlugin extends PlayPlugin {
         e instanceof PersistenceException) {
       if (e.getCause() != null) e = e.getCause();
     }
-    String key = e.toString().split("\n")[0];
+    String key = "[" + source + "] " + key(e);
     AtomicInteger value = exceptions.get(key);
     if (value == null) exceptions.put(key, value = new AtomicInteger());
     value.incrementAndGet();
   }
 
+  static String key(Throwable e) {
+    return split(e.toString(), '\n')[0]
+        .replaceAll("@[0-9a-f]{4,}", "@*")
+        .replaceAll("\\{\\{.*\\}\\}", "*")
+        .replaceAll("[\\d*]{3,}", "*");
+  }
+
   @Override public String getStatus() {
     StringWriter sw = new StringWriter();
-    PrintWriter out = new PrintWriter(sw);
+    try (PrintWriter out = new PrintWriter(sw)) {
 
-    out.println("Exceptions statistics:");
-    out.println("~~~~~~~~~~~~~~~~~~~~~~");
+      out.println("Exception statistics:");
+      out.println("~~~~~~~~~~~~~~~~~~~~~~");
 
-    ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
-    Collections.sort(sorted, new Comparator<Map.Entry<String, AtomicInteger>>() {
-      @Override public int compare(Map.Entry<String, AtomicInteger> o1, Map.Entry<String, AtomicInteger> o2) {
-        return o2.getValue().get() - o1.getValue().get();
+      ArrayList<Map.Entry<String, AtomicInteger>> sorted = new ArrayList<>(exceptions.entrySet());
+      sort(sorted, (o1, o2) -> compare(o2.getValue().get(), o1.getValue().get()));
+
+      for (Map.Entry<String, AtomicInteger> entry : sorted) {
+        out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
       }
-    });
-
-    for (Map.Entry<String, AtomicInteger> entry : sorted) {
-      out.println(format("%4d : %s", entry.getValue().get(), entry.getKey()));
     }
 
     return sw.toString();
   }
 
-  public static ConcurrentHashMap<String, AtomicInteger> getExceptions() {
+  public static Map<String, AtomicInteger> getExceptions() {
     return exceptions;
+  }
+  
+  public static void resetExceptions() {
+    exceptions.clear();
   }
 }
