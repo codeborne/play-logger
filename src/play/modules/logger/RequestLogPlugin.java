@@ -58,7 +58,7 @@ public class RequestLogPlugin extends PlayPlugin {
     Http.Request.current().args.put("play.modules.logger.Result", result);
   }
 
-  static void logRequestInfo(Result result) {
+  public static void logRequestInfo(Result result) {
     Http.Request request = Http.Request.current();
     Scope.Session session = Scope.Session.current();
 
