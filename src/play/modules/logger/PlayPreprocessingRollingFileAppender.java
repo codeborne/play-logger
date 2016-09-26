@@ -6,6 +6,7 @@ import org.apache.log4j.spi.ThrowableInformation;
 import play.exceptions.ActionNotFoundException;
 import play.exceptions.JavaExecutionException;
 import play.mvc.Http;
+import play.mvc.Scope;
 import play.mvc.results.Error;
 import play.mvc.results.NotFound;
 
@@ -29,13 +30,15 @@ public class PlayPreprocessingRollingFileAppender extends DailyRollingFileAppend
     super.append(event);
   }
 
-  private boolean appendToRequestLog(Throwable throwable) {
-    if (throwable instanceof ActionNotFoundException) {
-      logRequestInfo(new NotFound("")); // do not log "not found" in general log
+  private boolean appendToRequestLog(Throwable result) {
+    Http.Request request = Http.Request.current();
+    Scope.Session session = Scope.Session.current();
+    if (result instanceof ActionNotFoundException) {
+      logRequestInfo(request, session, new NotFound("")); // do not log "not found" in general log
       return true;
     }
-    else if (throwable instanceof JavaExecutionException) {
-      logRequestInfo(new Error(""));
+    else if (result instanceof JavaExecutionException) {
+      logRequestInfo(request, session, new Error(""));
     }
     return false;
   }

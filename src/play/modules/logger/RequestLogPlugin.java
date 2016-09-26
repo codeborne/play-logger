@@ -50,22 +50,17 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   @Override public void onActionInvocationFinally() {
-    Result result = (Result) Http.Request.current().args.get("play.modules.logger.Result");
-    logRequestInfo(result);
+    Http.Request request = Http.Request.current();
+    Result result = (Result) request.args.get("play.modules.logger.Result");
+    if (isAwait(request, result)) return;
+    logRequestInfo(request, Scope.Session.current(), result);
   }
 
   @Override public void onActionInvocationResult(Result result) {
     Http.Request.current().args.put("play.modules.logger.Result", result);
   }
 
-  public static void logRequestInfo(Result result) {
-    Http.Request request = Http.Request.current();
-    Scope.Session session = Scope.Session.current();
-
-    if (isAwait(request, result)) {
-      return;
-    }
-
+  public static void logRequestInfo(Http.Request request, Scope.Session session, Result result) {
     String executionTime = "";
     if (request != null && request.args != null) {
       Long start = (Long) request.args.get("startTime");
@@ -98,7 +93,7 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   private static String path(Http.Request request) {
-    return request.action != null && request.action.startsWith(LOG_AS_PATH) ? request.path : request.action;
+    return request.action == null || request.action.startsWith(LOG_AS_PATH) ? request.path : request.action;
   }
 
   private static final Set<String> SKIPPED_PARAMS = new HashSet<>(asList("authenticityToken", "action", "controller", "x-http-method-override", "body", "action", "controller"));
