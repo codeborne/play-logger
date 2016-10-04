@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1 (04.10.2016)
+
+* Upgrade to mockito 2.1.0
+
+## 2.0 (04.10.2016)
+
+* log template rendering time, available in upcoming play 1.4.x
+
 ## 1.15 (10.08.2016)
 
 * Does not log "await" responses
