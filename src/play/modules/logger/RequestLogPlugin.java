@@ -7,6 +7,7 @@ import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
 import play.mvc.results.Redirect;
+import play.mvc.results.RenderTemplate;
 import play.mvc.results.Result;
 
 import java.lang.reflect.Method;
@@ -80,12 +81,11 @@ public class RequestLogPlugin extends PlayPlugin {
     return result == null && request.args.containsKey("__continuation");
   }
 
-  private static String result(Result result) {
-    return result == null ?
-      "RenderError" :
-      (result instanceof Redirect) ?
-        result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
-        result.getClass().getSimpleName();
+  static String result(Result result) {
+    return result == null ? "RenderError" :
+           result instanceof Redirect ? result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
+           result instanceof RenderTemplate ? "RenderTemplate " + ((RenderTemplate) result).getRenderTime() + " ms" :
+           result.getClass().getSimpleName();
   }
 
   static String getRequestLogCustomData(Http.Request request) {

@@ -5,6 +5,8 @@ import org.junit.Test;
 import play.Play;
 import play.data.parsing.UrlEncodedParser;
 import play.mvc.Http;
+import play.mvc.results.Redirect;
+import play.mvc.results.RenderTemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -12,6 +14,8 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RequestLogPluginTest {
   @SuppressWarnings("deprecation")
@@ -124,6 +128,24 @@ public class RequestLogPluginTest {
     Thread.currentThread().setName("play-thread-007 Payments.history");
     new RequestLogPlugin().afterActionInvocation();
     assertEquals("play-thread-007", Thread.currentThread().getName());
+  }
+
+  @Test
+  public void noResultMeansRenderingError() throws Exception {
+    assertEquals("RenderError", RequestLogPlugin.result(null));
+  }
+
+  @Test
+  public void logsRedirectUrl() throws Exception {
+    Redirect result = new Redirect("/foo");
+    assertEquals("Redirect /foo", RequestLogPlugin.result(result));
+  }
+
+  @Test
+  public void logsTemplateRenderingTime() throws Exception {
+    RenderTemplate result = mock(RenderTemplate.class);
+    when(result.getRenderTime()).thenReturn(101L);
+    assertEquals("RenderTemplate 101 ms", RequestLogPlugin.result(result));
   }
 
   private void setQueryString(String params) {
