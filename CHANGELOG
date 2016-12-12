@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2 (12.12.2016)
+
+* Improve card number masking
+
 ## 2.1 (04.10.2016)
 
 * Upgrade to mockito 2.1.0
