@@ -1,16 +1,17 @@
 package play.modules.logger;
 
+import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import static org.apache.log4j.Priority.WARN;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class CardNumberFilteringLayoutTest {
   CardNumberFilteringLayout cardNumberFilteringLayout = spy(new CardNumberFilteringLayout());
@@ -31,5 +32,15 @@ public class CardNumberFilteringLayoutTest {
 
     verify(cardNumberFilteringLayout).superFormat(eventCaptor.capture());
     assertThat(eventCaptor.getValue(), is(sameInstance(event)));
+  }
+
+  @Test
+  public void cardNumbersInThreadNameAreMasked() throws Exception {
+    Thread.currentThread().setName("thread name with PAN 1234123412341234");
+    CardNumberFilteringLayout layout = new CardNumberFilteringLayout();
+    layout.setConversionPattern("[%R] %m");
+    LoggingEvent info = new LoggingEvent("INFO", mock(Category.class), WARN, "message", null);
+
+    assertThat(layout.format(info), is("[thread name with PAN 123412******1234] message"));
   }
 }

@@ -30,4 +30,14 @@ public class CardNumberFilteringLayout extends ExtendedPatternLayout {
   String superFormat(LoggingEvent maskedEvent) {
     return super.format(maskedEvent);
   }
+
+  @Override protected RequestIdPatternConverter createRequestIdPatternConverter() {
+    return new CardNumberAwareRequestIdPatternConverter();
+  }
+
+  private static class CardNumberAwareRequestIdPatternConverter extends RequestIdPatternConverter {
+    @Override protected String currentThreadName() {
+      return maskCardNumber(super.currentThreadName());
+    }
+  }
 }
