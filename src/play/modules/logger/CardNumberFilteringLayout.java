@@ -4,15 +4,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 
-import static play.modules.logger.Utils.maskCardNumber;
-
 public class CardNumberFilteringLayout extends ExtendedPatternLayout {
+  Obfuscator obfuscator = new Obfuscator();
 
   @Override
   public String format(LoggingEvent event) {
     if (event.getMessage() instanceof String) {
       String message = event.getRenderedMessage();
-      String maskedMessage = maskCardNumber(message);
+      String maskedMessage = obfuscator.maskCardNumber(message);
 
       if (!message.equals(maskedMessage)) {
         ThrowableInformation throwableInformation = event.getThrowableInformation();
@@ -36,8 +35,10 @@ public class CardNumberFilteringLayout extends ExtendedPatternLayout {
   }
 
   private static class CardNumberAwareRequestIdPatternConverter extends RequestIdPatternConverter {
+    Obfuscator obfuscator = new Obfuscator();
+    
     @Override protected String currentThreadName() {
-      return maskCardNumber(super.currentThreadName());
+      return obfuscator.maskCardNumber(super.currentThreadName());
     }
   }
 }

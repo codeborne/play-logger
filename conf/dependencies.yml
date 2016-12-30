@@ -1,7 +1,7 @@
-self: play -> logger 2.2
+self: play -> logger 2.3
 
 require:
-    - play 1.4
-    - org.mockito -> mockito-core 2.1.0
+    - play 1.4.+
+    - org.mockito -> mockito-core 2.5.0
     - org.hamcrest -> hamcrest-all 1.3
 
