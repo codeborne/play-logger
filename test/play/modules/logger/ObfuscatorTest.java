@@ -43,4 +43,10 @@ public class ObfuscatorTest {
     assertThat(obfuscator.isLikeCardNumber("7916000000"), is(false));
     assertThat(obfuscator.maskCardNumber("7916000000"), is("7916000000"));
   }
+
+  @Test
+  public void masksMultipleCardNumbersInText() {
+    assertThat(obfuscator.maskCardNumber("4797707124015750 tere foo4797707124015750bar"), 
+        is("479770******5750 tere foo479770******5750bar"));
+  }
 }
