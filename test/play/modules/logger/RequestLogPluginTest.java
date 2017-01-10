@@ -145,7 +145,8 @@ public class RequestLogPluginTest {
   public void logsTemplateRenderingTime() throws Exception {
     RenderTemplate result = mock(RenderTemplate.class);
     when(result.getRenderTime()).thenReturn(101L);
-    assertEquals("RenderTemplate 101 ms", RequestLogPlugin.result(result));
+    when(result.getName()).thenReturn("Employees/registry.html");
+    assertEquals("RenderTemplate Employees/registry.html 101 ms", RequestLogPlugin.result(result));
   }
 
   private void setQueryString(String params) {

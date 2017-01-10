@@ -83,9 +83,17 @@ public class RequestLogPlugin extends PlayPlugin {
 
   static String result(Result result) {
     return result == null ? "RenderError" :
-           result instanceof Redirect ? result.getClass().getSimpleName() + ' ' + ((Redirect) result).url :
-           result instanceof RenderTemplate ? "RenderTemplate " + ((RenderTemplate) result).getRenderTime() + " ms" :
+           result instanceof Redirect ? toString((Redirect) result) :
+           result instanceof RenderTemplate ? toString((RenderTemplate) result) :
            result.getClass().getSimpleName();
+  }
+
+  private static String toString(Redirect result) {
+    return result.getClass().getSimpleName() + ' ' + result.url;
+  }
+
+  private static String toString(RenderTemplate result) {
+    return "RenderTemplate " + result.getName() + " " + result.getRenderTime() + " ms";
   }
 
   static String getRequestLogCustomData(Http.Request request) {

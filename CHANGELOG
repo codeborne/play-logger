@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4 (10.01.2017)
+
+* log template name in case of RenderTemplate response
+
 ## 2.3 (30.12.2016)
 
 * Rename class Util to Obfuscator, make it public and non-static
