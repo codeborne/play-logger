@@ -1,14 +1,13 @@
 package play.modules.logger;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
-import play.mvc.results.Redirect;
-import play.mvc.results.RenderTemplate;
-import play.mvc.results.Result;
+import play.mvc.results.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -16,9 +15,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 
 public class RequestLogPlugin extends PlayPlugin {
   private static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
@@ -85,6 +86,8 @@ public class RequestLogPlugin extends PlayPlugin {
     return result == null ? "RenderError" :
            result instanceof Redirect ? toString((Redirect) result) :
            result instanceof RenderTemplate ? toString((RenderTemplate) result) :
+           result instanceof RenderBinary ? toString((RenderBinary) result) :
+           result instanceof Forbidden ? toString((Forbidden) result) :
            result.getClass().getSimpleName();
   }
 
@@ -94,6 +97,16 @@ public class RequestLogPlugin extends PlayPlugin {
 
   private static String toString(RenderTemplate result) {
     return "RenderTemplate " + result.getName() + " " + result.getRenderTime() + " ms";
+  }
+
+  private static String toString(RenderBinary result) {
+    return Stream.of(result.getClass().getSimpleName(), result.getName(), result.getContentType())
+        .filter(StringUtils::isNotEmpty)
+        .collect(joining(" "));
+  }
+
+  private static String toString(Forbidden result) {
+    return result.getClass().getSimpleName() + " \"" + result.getMessage() + "\"";
   }
 
   static String getRequestLogCustomData(Http.Request request) {

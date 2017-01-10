@@ -3,6 +3,8 @@
 ## 2.4 (10.01.2017)
 
 * log template name in case of RenderTemplate response
+* log file name and content type for RenderBinary response
+* log reason for Forbidden response
 
 ## 2.3 (30.12.2016)
 

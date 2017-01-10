@@ -5,10 +5,13 @@ import org.junit.Test;
 import play.Play;
 import play.data.parsing.UrlEncodedParser;
 import play.mvc.Http;
+import play.mvc.results.Forbidden;
 import play.mvc.results.Redirect;
+import play.mvc.results.RenderBinary;
 import play.mvc.results.RenderTemplate;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Properties;
@@ -131,22 +134,40 @@ public class RequestLogPluginTest {
   }
 
   @Test
-  public void noResultMeansRenderingError() throws Exception {
+  public void noResultMeansRenderingError() {
     assertEquals("RenderError", RequestLogPlugin.result(null));
   }
 
   @Test
-  public void logsRedirectUrl() throws Exception {
+  public void logsRedirectUrl() {
     Redirect result = new Redirect("/foo");
     assertEquals("Redirect /foo", RequestLogPlugin.result(result));
   }
 
   @Test
-  public void logsTemplateRenderingTime() throws Exception {
+  public void logsTemplateRenderingTime() {
     RenderTemplate result = mock(RenderTemplate.class);
     when(result.getRenderTime()).thenReturn(101L);
     when(result.getName()).thenReturn("Employees/registry.html");
     assertEquals("RenderTemplate Employees/registry.html 101 ms", RequestLogPlugin.result(result));
+  }
+
+  @Test
+  public void logsFileName_forRenderBinary() {
+    RenderBinary result = new RenderBinary((InputStream) null, "statement.dbf");
+    assertEquals("RenderBinary statement.dbf", RequestLogPlugin.result(result));
+  }
+
+  @Test
+  public void logsFileNameAndContentType_forRenderBinary() {
+    RenderBinary result = new RenderBinary(null, "cert.pem", "application/pkix-cert", false);
+    assertEquals("RenderBinary cert.pem application/pkix-cert", RequestLogPlugin.result(result));
+  }
+  
+  @Test
+  public void logsReason_forForbidden() {
+    Forbidden result = new Forbidden("User signature not valid!");
+    assertEquals("Forbidden \"User signature not valid!\"", RequestLogPlugin.result(result));
   }
 
   private void setQueryString(String params) {
