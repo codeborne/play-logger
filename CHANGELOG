@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5 (17.02.2017)
+
+* support more errors
+
 ## 2.4 (10.01.2017)
 
 * log template name in case of RenderTemplate response
