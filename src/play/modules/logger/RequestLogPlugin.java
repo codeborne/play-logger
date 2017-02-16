@@ -8,6 +8,7 @@ import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
 import play.mvc.results.*;
+import play.mvc.results.Error;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -87,7 +88,7 @@ public class RequestLogPlugin extends PlayPlugin {
            result instanceof Redirect ? toString((Redirect) result) :
            result instanceof RenderTemplate ? toString((RenderTemplate) result) :
            result instanceof RenderBinary ? toString((RenderBinary) result) :
-           result instanceof Forbidden ? toString((Forbidden) result) :
+           result instanceof Error ? toString((Error) result) :
            result.getClass().getSimpleName();
   }
 
@@ -105,7 +106,7 @@ public class RequestLogPlugin extends PlayPlugin {
         .collect(joining(" "));
   }
 
-  private static String toString(Forbidden result) {
+  private static String toString(Error result) {
     return result.getClass().getSimpleName() + " \"" + result.getMessage() + "\"";
   }
 
