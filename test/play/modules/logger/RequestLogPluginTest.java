@@ -5,10 +5,7 @@ import org.junit.Test;
 import play.Play;
 import play.data.parsing.UrlEncodedParser;
 import play.mvc.Http;
-import play.mvc.results.Forbidden;
-import play.mvc.results.Redirect;
-import play.mvc.results.RenderBinary;
-import play.mvc.results.RenderTemplate;
+import play.mvc.results.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -165,9 +162,13 @@ public class RequestLogPluginTest {
   }
   
   @Test
-  public void logsReason_forForbidden() {
-    Forbidden result = new Forbidden("User signature not valid!");
-    assertEquals("Forbidden \"User signature not valid!\"", RequestLogPlugin.result(result));
+  public void logsReason_forError() {
+    Forbidden forbidden = new Forbidden("User signature not valid!");
+    assertEquals("Forbidden \"User signature not valid!\"", RequestLogPlugin.result(forbidden));
+    BadRequest badRequest = new BadRequest("input error!");
+    assertEquals("BadRequest \"input error!\"", RequestLogPlugin.result(badRequest));
+    EvilRequest evilRequest=new EvilRequest("evil request");
+    assertEquals("EvilRequest \"evil request\"", RequestLogPlugin.result(evilRequest));
   }
 
   private void setQueryString(String params) {
