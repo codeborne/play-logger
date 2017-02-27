@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6 (27.02.2017)
+
+* support RenderView result
+* upgrade to Play 1.5.+
+
 ## 2.5 (17.02.2017)
 
 * support more errors

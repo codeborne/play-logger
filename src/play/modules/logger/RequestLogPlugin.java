@@ -9,6 +9,7 @@ import play.mvc.Http;
 import play.mvc.Scope;
 import play.mvc.results.*;
 import play.mvc.results.Error;
+import play.rebel.RenderView;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -87,6 +88,7 @@ public class RequestLogPlugin extends PlayPlugin {
     return result == null ? "RenderError" :
            result instanceof Redirect ? toString((Redirect) result) :
            result instanceof RenderTemplate ? toString((RenderTemplate) result) :
+           result instanceof RenderView ? toString((RenderView) result) :
            result instanceof RenderBinary ? toString((RenderBinary) result) :
            result instanceof Error ? toString((Error) result) :
            result.getClass().getSimpleName();
@@ -98,6 +100,10 @@ public class RequestLogPlugin extends PlayPlugin {
 
   private static String toString(RenderTemplate result) {
     return "RenderTemplate " + result.getName() + " " + result.getRenderTime() + " ms";
+  }
+
+  private static String toString(RenderView result) {
+    return "RenderView " + result.getName() + " " + result.getRenderTime() + " ms";
   }
 
   private static String toString(RenderBinary result) {

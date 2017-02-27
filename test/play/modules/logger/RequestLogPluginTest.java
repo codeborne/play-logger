@@ -6,6 +6,7 @@ import play.Play;
 import play.data.parsing.UrlEncodedParser;
 import play.mvc.Http;
 import play.mvc.results.*;
+import play.rebel.RenderView;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -147,6 +148,14 @@ public class RequestLogPluginTest {
     when(result.getRenderTime()).thenReturn(101L);
     when(result.getName()).thenReturn("Employees/registry.html");
     assertEquals("RenderTemplate Employees/registry.html 101 ms", RequestLogPlugin.result(result));
+  }
+
+  @Test
+  public void logsViewRenderingTime() {
+    RenderView result = mock(RenderView.class);
+    when(result.getRenderTime()).thenReturn(101L);
+    when(result.getName()).thenReturn("Employees/registry.html");
+    assertEquals("RenderView Employees/registry.html 101 ms", RequestLogPlugin.result(result));
   }
 
   @Test
