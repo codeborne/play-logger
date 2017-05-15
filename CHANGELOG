@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.1 (15.05.2017)
+
+* logs empty params string if there was an error when parsing http parameters
+
+## 2.7 (03.03.2017)
+
+* request id can be passed through MDC
+
 ## 2.6 (27.02.2017)
 
 * support RenderView result

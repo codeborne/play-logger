@@ -134,6 +134,16 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   public static String extractParams(Http.Request request) {
+    try {
+      return extractParamsUnsafe(request);
+    }
+    catch (Exception e) {
+      logger.error("Failed to parse request params", e);
+      return "";
+    }
+  }
+
+  private static String extractParamsUnsafe(Http.Request request) {
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<String, String[]> param : request.params.all().entrySet()) {
       String name = param.getKey();

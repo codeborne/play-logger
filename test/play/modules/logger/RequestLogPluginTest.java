@@ -97,6 +97,14 @@ public class RequestLogPluginTest {
   }
 
   @Test
+  public void paramsAreSkipped_if_thereWasAnErrorWhenParsingRequestParams() {
+    request.contentType = "application/json";
+    request.encoding = "erroneous";
+
+    assertEquals("", RequestLogPlugin.extractParams(request));
+  }
+
+  @Test
   public void customLogData() {
     assertEquals("", RequestLogPlugin.getRequestLogCustomData(request));
 
