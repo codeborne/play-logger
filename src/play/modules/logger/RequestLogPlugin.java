@@ -7,8 +7,8 @@ import play.Play;
 import play.PlayPlugin;
 import play.mvc.Http;
 import play.mvc.Scope;
-import play.mvc.results.*;
 import play.mvc.results.Error;
+import play.mvc.results.*;
 import play.rebel.RenderView;
 
 import java.lang.reflect.Method;
@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static java.lang.System.currentTimeMillis;
+import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
@@ -35,7 +35,7 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   @Override public void routeRequest(Http.Request request) {
-    request.args.put("startTime", currentTimeMillis());
+    request.args.put("startTime", nanoTime());
     request.args.put("requestId", REQUEST_ID_PREFIX + "-" + counter.incrementAndGet());
   }
 
@@ -68,7 +68,7 @@ public class RequestLogPlugin extends PlayPlugin {
     String executionTime = "";
     if (request != null && request.args != null) {
       Long start = (Long) request.args.get("startTime");
-      if (start != null) executionTime = " " + (currentTimeMillis() - start) + " ms";
+      if (start != null) executionTime = " " + (nanoTime() - start) / 1_000_000 + " ms";
     }
 
     logger.info(path(request) +

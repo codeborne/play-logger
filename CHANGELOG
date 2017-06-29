@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8 (29.06.2017)
+
+* use System.nanoTime() instead of System.currentTimeMillis() for measuring request processing time
+
 ## 2.7.1 (15.05.2017)
 
 * logs empty params string if there was an error when parsing http parameters
