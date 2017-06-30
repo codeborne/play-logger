@@ -75,6 +75,7 @@ public class RequestLogPlugin extends PlayPlugin {
         ' ' + request.remoteAddress +
         ' ' + session.getId() +
         getRequestLogCustomData(request) +
+        ' ' + request.method +
         ' ' + extractParams(request) +
         " -> " + result(result) +
         executionTime);

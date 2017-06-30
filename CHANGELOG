@@ -2,6 +2,7 @@
 
 ## 2.8 (29.06.2017)
 
+* add request method (GET/POST) to the request log
 * use System.nanoTime() instead of System.currentTimeMillis() for measuring request processing time
 
 ## 2.7.1 (15.05.2017)
