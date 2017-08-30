@@ -2,9 +2,11 @@ package play.modules.logger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 import play.Play;
 import play.data.parsing.UrlEncodedParser;
 import play.mvc.Http;
+import play.mvc.Scope;
 import play.mvc.results.*;
 import play.rebel.RenderView;
 
@@ -15,8 +17,8 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.*;
 
 public class RequestLogPluginTest {
   @SuppressWarnings("deprecation")
@@ -196,5 +198,36 @@ public class RequestLogPluginTest {
       throw new RuntimeException(e);
     }
   }
-}
 
+  @Test
+  public void logRequestInfo() {
+    request.action = "Bank.overview";
+    request.method = "GET";
+    request.remoteAddress = "111.222.333.444";
+    request.args.put("startTime", 1000000000L);
+    request.args.put("requestLogCustomData", "c-corporate");
+    request.params.put("paymentId", "12345");
+    Scope.Session session = mock(Scope.Session.class);
+    when(session.getId()).thenReturn("session-id-001");
+    RequestLogPlugin.logger = mock(Logger.class);
+
+    RequestLogPlugin.logRequestInfo(request, session, new Redirect("/foo"));
+
+    verify(RequestLogPlugin.logger).info(startsWith("Bank.overview 111.222.333.444 session-id-001 c-corporate GET paymentId=12345 -> Redirect /foo"));
+  }
+
+  @Test
+  public void logRequestInfo_whenSessionIsNull() {
+    request.action = "Bank.overview";
+    request.method = "GET";
+    request.remoteAddress = "111.222.333.444";
+    request.args.put("startTime", 1000000000L);
+    request.args.put("requestLogCustomData", "c-corporate");
+    request.params.put("paymentId", "12345");
+    RequestLogPlugin.logger = mock(Logger.class);
+
+    RequestLogPlugin.logRequestInfo(request, null, new Redirect("/foo"));
+
+    verify(RequestLogPlugin.logger).info(startsWith("Bank.overview 111.222.333.444 no-session c-corporate GET paymentId=12345 -> Redirect /foo"));
+  }
+}

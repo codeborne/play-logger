@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -26,7 +27,7 @@ import static java.util.stream.Collectors.joining;
 public class RequestLogPlugin extends PlayPlugin {
   private static final String REQUEST_ID_PREFIX = Integer.toHexString((int)(Math.random() * 0x1000));
   private static final AtomicInteger counter = new AtomicInteger(1);
-  private static final Logger logger = LoggerFactory.getLogger("request");
+  static Logger logger = LoggerFactory.getLogger("request");
 
   private static final String LOG_AS_PATH = Play.configuration.getProperty("request.log.pathForAction", "Web.");
   
@@ -66,14 +67,14 @@ public class RequestLogPlugin extends PlayPlugin {
 
   public static void logRequestInfo(Http.Request request, Scope.Session session, Result result) {
     String executionTime = "";
-    if (request != null && request.args != null) {
+    if (request.args != null) {
       Long start = (Long) request.args.get("startTime");
-      if (start != null) executionTime = " " + (nanoTime() - start) / 1_000_000 + " ms";
+      if (start != null) executionTime = " " + TimeUnit.NANOSECONDS.toMillis(nanoTime() - start) + " ms";
     }
 
     logger.info(path(request) +
         ' ' + request.remoteAddress +
-        ' ' + session.getId() +
+        ' ' + (session == null ? "no-session" : session.getId()) +
         getRequestLogCustomData(request) +
         ' ' + request.method +
         ' ' + extractParams(request) +
