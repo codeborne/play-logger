@@ -41,7 +41,12 @@ public class RequestLogPlugin extends PlayPlugin {
   }
 
   @Override public void beforeActionInvocation(Method actionMethod) {
-    Thread.currentThread().setName(getOriginalThreadName() + " " + Http.Request.current().action);
+    Thread.currentThread().setName(String.format("%s %s [%s] (%s %s)",
+      getOriginalThreadName(),
+      Http.Request.current().action,
+      Http.Request.current().args.get("requestId"),
+      Http.Request.current().remoteAddress,
+      (Scope.Session.current() == null ? "no-session" : Scope.Session.current().getId())));
   }
 
   @Override public void afterActionInvocation() {

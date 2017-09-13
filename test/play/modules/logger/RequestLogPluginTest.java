@@ -1,5 +1,6 @@
 package play.modules.logger;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,7 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.startsWith;
@@ -26,10 +26,17 @@ public class RequestLogPluginTest {
 
   @Before
   public void setUp() {
-    if (Play.configuration == null) Play.configuration = new Properties();
+    Play.configuration.clear();
     Play.configuration.setProperty("request.log.maskParams", "password|cvv|card.cvv|card.number");
     new RequestLogPlugin().onConfigurationRead();
     Http.Request.current.set(request);
+  }
+
+  @After
+  public void tearDown() {
+    Play.configuration.clear();
+    Http.Request.current.remove();
+    Scope.Session.current.remove();
   }
 
   @Test
@@ -119,19 +126,25 @@ public class RequestLogPluginTest {
   @Test
   public void setsCurrentThreadName_by_actionName() {
     request.action = "Payments.history";
+    request.args.put("requestId", "xxx-yyy");
+    request.remoteAddress = "111.22.3.444";
+    Scope.Session.current.set(mockSession("session-002"));
     Thread.currentThread().setName("play-thread-666");
 
     new RequestLogPlugin().beforeActionInvocation(null);
-    assertEquals("play-thread-666 Payments.history", Thread.currentThread().getName());
+    assertEquals("play-thread-666 Payments.history [xxx-yyy] (111.22.3.444 session-002)", Thread.currentThread().getName());
   }
 
   @Test
   public void ignoresPreviouslySetThreadName_if_itWasNotResetForWhateverReason() {
     request.action = "Payments.history";
+    request.args.put("requestId", "yyy-zzz");
+    request.remoteAddress = "127.0.0.1";
+    Scope.Session.current.set(mockSession("session-003"));
     Thread.currentThread().setName("play-thread-1 Bank.statement");
 
     new RequestLogPlugin().beforeActionInvocation(null);
-    assertEquals("play-thread-1 Payments.history", Thread.currentThread().getName());
+    assertEquals("play-thread-1 Payments.history [yyy-zzz] (127.0.0.1 session-003)", Thread.currentThread().getName());
   }
 
   @Test
@@ -207,13 +220,18 @@ public class RequestLogPluginTest {
     request.args.put("startTime", 1000000000L);
     request.args.put("requestLogCustomData", "c-corporate");
     request.params.put("paymentId", "12345");
-    Scope.Session session = mock(Scope.Session.class);
-    when(session.getId()).thenReturn("session-id-001");
+    Scope.Session session = mockSession("session-id-001");
     RequestLogPlugin.logger = mock(Logger.class);
 
     RequestLogPlugin.logRequestInfo(request, session, new Redirect("/foo"));
 
     verify(RequestLogPlugin.logger).info(startsWith("Bank.overview 111.222.333.444 session-id-001 c-corporate GET paymentId=12345 -> Redirect /foo"));
+  }
+
+  private Scope.Session mockSession(String sessionId) {
+    Scope.Session session = mock(Scope.Session.class);
+    when(session.getId()).thenReturn(sessionId);
+    return session;
   }
 
   @Test
