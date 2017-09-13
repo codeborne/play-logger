@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11 (13.09.2017)
+
+* reset thread name in afterInvocationFinally (which is later than afterActionInvocvation)
+
 ## 2.10 (13.09.2017)
 
 * Add IP and session ID to current thread name - it will allow us to see them in thread dumps

@@ -49,10 +49,6 @@ public class RequestLogPlugin extends PlayPlugin {
       (Scope.Session.current() == null ? "no-session" : Scope.Session.current().getId())));
   }
 
-  @Override public void afterActionInvocation() {
-    Thread.currentThread().setName(getOriginalThreadName());
-  }
-
   private String getOriginalThreadName() {
     String name = Thread.currentThread().getName();
     int i = name.indexOf(' ');
@@ -62,8 +58,10 @@ public class RequestLogPlugin extends PlayPlugin {
   @Override public void onActionInvocationFinally() {
     Http.Request request = Http.Request.current();
     Result result = (Result) request.args.get("play.modules.logger.Result");
-    if (isAwait(request, result)) return;
-    logRequestInfo(request, Scope.Session.current(), result);
+    if (!isAwait(request, result)) {
+      logRequestInfo(request, Scope.Session.current(), result);
+    }
+    Thread.currentThread().setName(getOriginalThreadName());
   }
 
   @Override public void onActionInvocationResult(Result result) {

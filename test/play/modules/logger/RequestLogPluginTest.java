@@ -150,7 +150,7 @@ public class RequestLogPluginTest {
   @Test
   public void resetsCurrentThreadName_after_actionInvocation() {
     Thread.currentThread().setName("play-thread-007 Payments.history");
-    new RequestLogPlugin().afterActionInvocation();
+    new RequestLogPlugin().onActionInvocationFinally();
     assertEquals("play-thread-007", Thread.currentThread().getName());
   }
 
